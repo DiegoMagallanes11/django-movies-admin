@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Recommendations</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; }
+        h1 { color: #333; }
+        .filters { margin-bottom: 20px; }
+        .filters select, .filters button { padding: 8px; font-size: 14px; }
+        .movie-list { list-style: none; padding: 0; }
+        .movie-item { border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 5px; }
+        .movie-title { font-size: 18px; font-weight: bold; }
+        .movie-info { color: #666; margin-top: 5px; }
+        .rating { color: #f39c12; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Movie Recommendations</h1>
+
+    <div class="filters">
+        <form method="get">
+            <label for="genre">Filter by genre:</label>
+            <select name="genre" id="genre">
+                <option value="">All genres</option>
+                {% for genre in genres %}
+                <option value="{{ genre.id }}" {% if selected_genre and selected_genre.id == genre.id %}selected{% endif %}>
+                    {{ genre.name }}
+                </option>
+                {% endfor %}
+            </select>
+            <button type="submit">Filter</button>
+        </form>
+    </div>
+
+    {% if selected_genre %}
+    <h2>Top rated in {{ selected_genre.name }}</h2>
+    {% else %}
+    <h2>Top rated movies</h2>
+    {% endif %}
+
+    <ul class="movie-list">
+        {% for item in recommendations %}
+        <li class="movie-item">
+            <div class="movie-title">{{ item.movie.title }} ({{ item.movie.year }})</div>
+            <div class="movie-info">
+                Director: {{ item.movie.director|default:"Unknown" }} |
+                Genres: {% for genre in item.movie.genres.all %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+            </div>
+            <div class="rating">
+                {% if item.average_rating > 0 %}
+                    Rating: {{ item.average_rating }}/5
+                {% else %}
+                    No ratings yet
+                {% endif %}
+            </div>
+        </li>
+        {% empty %}
+        <li>No movies found.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
